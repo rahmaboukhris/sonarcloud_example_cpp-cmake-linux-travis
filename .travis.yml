@@ -1,25 +1,34 @@
-dist: trusty
-sudo: false
+language: go
 
+go:
+  - "1.10"
+
+install:
+  #Installs Go Meta Linter (Golint and Go vet are also supported independently)
+  - go get -u gopkg.in/alecthomas/gometalinter.v2
+  - $GOPATH/bin/gometalinter.v2 --install
+  - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip 
+  - unzip sonar-scanner-cli-4.2.0.1873-linux.zip 
+  - rm sonar-scanner-cli-4.2.0.1873-linux.zip 
+  - mv sonar-scanner-4.2.0.1873-linux sonar-scanner 
+  - wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+  - unzip build-wrapper-linux-x86.zip
+  - rm build-wrapper-linux-x86.zip 
+  - mv build-wrapper-linux-x86 build-wrapper
+ 
 addons:
   sonarcloud:
     organization: "rahmaboukhris"
-    token:
-      secure: "e13369a1c4fb21ba40e43edc9d610d9c532b0440"
+    token: "e13369a1c4fb21ba40e43edc9d610d9c532b0440" # encrypted value of your token
 
 script:
-  # Prepare the build system
-  - mkdir build
-  - cd build
-  - cmake ..
-  - cd ..
-  # Wraps the compilation with the Build Wrapper to generate configuration (used
-  # later by the SonarQube Scanner) into the "bw-output" folder
-  - build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/
-  # And finally run the SonarQube analysis - read the "sonar-project.properties"
-  # file to see the specific configuration
-  - sonar-scanner
+  # Execute Go Meta Linter
+  - $GOPATH/bin/gometalinter.v2 samples/ > gometalinter-report.out || true
+  - build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make clean all 
+  # Execute tests and coverage
+  # And then execute SonarCloud analysis which will run its own code analysis, and also reuse the linters' results
+  - sonar-scanner/bin/sonar-scanner -Dsonar.organization=rahmaboukhris -Dsonar.projectKey=testmanual -Dsonar.projectName=testmanual -Dsonar.cfamily.build-wrapper-output=bw_output
 
 cache:
   directories:
-    - '$HOME/.sonar/cache'
+  - '$HOME/.sonar/cache'
