@@ -7,15 +7,14 @@ addons:
     token: "e13369a1c4fb21ba40e43edc9d610d9c532b0440"
 
 script:
-  # Prepare the build system
-  - mkdir build
-  - cd build
-  - cmake ..
-  - cd ..
+  - make clean
   # Wraps the compilation with the Build Wrapper to generate configuration (used
   # later by the SonarQube Scanner) into the "bw-output" folder
-  - build-wrapper-linux-x86-64 --out-dir bw-output make clean
+  - build-wrapper-linux-x86-64 --out-dir bw-output make all
+  # Execute some tests
+  - make test
   # And finally run the SonarQube analysis - read the "sonar-project.properties"
+  # file to see the specific configuration
   # file to see the specific configuration
   - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output
  
