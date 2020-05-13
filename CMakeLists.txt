@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.9)
-project(sonar_scanner)
+cmake_minimum_required(VERSION 2.8)
 
-set(CMAKE_CXX_STANDARD 17)
+file(GLOB helloworld_SRC
+    "*.h"
+    "*.cpp"
+)
 
-add_executable(sonar_scanner src/main.cpp)
+add_executable(helloworld ${helloworld_SRC})
