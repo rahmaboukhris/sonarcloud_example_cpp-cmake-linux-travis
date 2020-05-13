@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-file(GLOB helloworld_SRC
+file(GLOB src
     "*.h"
     "*.cpp"
 )
 
-add_executable(helloworld ${helloworld_SRC})
+add_executable(helloworld ${src})
